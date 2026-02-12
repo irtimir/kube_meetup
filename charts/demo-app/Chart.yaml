@@ -1,0 +1,14 @@
+apiVersion: v2
+name: demo-app
+description: Kubernetes demo app
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+maintainers:
+  - name: Ilias
+
+dependencies:
+  - name: redis
+    version: "24.1.3"
+    repository: https://charts.bitnami.com/bitnami
+    condition: redis.enabled

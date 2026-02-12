@@ -1,0 +1,53 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "demo-app.fullname" . }}-stats
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "demo-app.labels" . | nindent 4 }}
+    component: cronjob
+spec:
+  schedule: {{ .Values.cronjob.schedule | quote }}
+
+  concurrencyPolicy: Forbid
+
+  successfulJobsHistoryLimit: {{ .Values.cronjob.successfulJobsHistoryLimit }}
+  failedJobsHistoryLimit: {{ .Values.cronjob.failedJobsHistoryLimit }}
+
+  jobTemplate:
+    spec:
+      ttlSecondsAfterFinished: 3600
+
+      template:
+        metadata:
+          labels:
+            app: cronjob
+            {{- include "demo-app.labels" . | nindent 12 }}
+        spec:
+          restartPolicy: OnFailure
+
+          containers:
+            - name: cronjob
+              image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+              imagePullPolicy: {{ .Values.image.pullPolicy }}
+
+              command: ["python", "-m", "app.cronjob"]
+
+              envFrom:
+                - configMapRef:
+                    name: {{ include "demo-app.fullname" . }}-config
+
+              env:
+                - name: REDIS_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ include "demo-app.fullname" . }}-secret
+                      key: REDIS_PASSWORD
+
+              resources:
+                requests:
+                  cpu: 50m
+                  memory: 64Mi
+                limits:
+                  cpu: 200m
+                  memory: 128Mi
