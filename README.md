@@ -123,24 +123,14 @@ kubectl get servicemonitor -n demo
 ### Cleanup
 
 ```bash
+# Resources in minikube
 helmfile destroy
+
+# Stop and delete minukube cluster
+minikube stop
+minikube delete
 ```
 
-## Local Development
-
-```bash
-# Install dependencies
-uv sync
-
-# Run API locally
-REDIS_HOST=localhost uv run python -m app.api
-
-# Run worker locally
-REDIS_HOST=localhost uv run python -m app.worker
-
-# Run cronjob locally
-REDIS_HOST=localhost uv run python -m app.cronjob
-```
 
 ## Project Structure
 
